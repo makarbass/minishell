@@ -98,7 +98,7 @@ int main(int ac, char **av, char **env)
 {
 	char *line;
 	t_min min;
-	line = readline(line);
+	line = readline("minishell$ ");
 	dup_env(env);
 	ft_parser(&min, line);
 	// printf("%s\n", line);
