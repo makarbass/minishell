@@ -1,0 +1,2 @@
+# minishell
+Совместный проект minishell.
