@@ -72,24 +72,6 @@ void	dup_env(char **env, t_min *min)
 	// printf("%d\n", size);
 }
 
-int	once_quote(char *line, int i, t_min *min)
-{
-	i++;
-	while (line[i] != '\'')
-	{
-		min->argc[min->com_count] = (char *)realloc(min->argc[min->com_count], sizeof(char) * (i - 1));
-		min->argc[min->com_count][i] = line[i];
-		printf("%c", min->argc[min->com_count][i]);
-		i++;
-	}
-	return (i);
-}
-
-void	two_quote(char *line, int i)
-{
-
-}
-
 int	dollar_funk(char *line, int i, t_min *min)
 {
 	int j;
@@ -102,46 +84,92 @@ int	dollar_funk(char *line, int i, t_min *min)
 	j = 0;
 	while (line[i] != ' ' && line[i] != '$' && line[i])
 		min->comand[j++] = line[i++];
-	if (ft_strcmp(min->comand, "pwd") || ft_strcmp(min->comand, "PWD"))
-		ft_pwd(min);
-	else if (ft_strcmp(min->comand, "echo") || ft_strcmp(min->comand, "ECHO"))
-		ft_echo(min);
-	else if (ft_strcmp(min->comand, "cd") || ft_strcmp(min->comand, "CD"))
-		ft_cd(min);
-	else if (ft_strcmp(min->comand, "export") || ft_strcmp(min->comand, "EXPORT"))
-		ft_export(min);
-	else if (ft_strcmp(min->comand, "unset") || ft_strcmp(min->comand, "UNSET"))
-		ft_unset(min);
-	else if (ft_strcmp(min->comand, "env") || ft_strcmp(min->comand, "ENV"))
-		ft_env(min);
-	else if (ft_strcmp(min->comand, "exit") || ft_strcmp(min->comand, "EXIT"))
-		ft_exit(min);
+	// if (ft_strcmp(min->comand, "pwd") || ft_strcmp(min->comand, "PWD"))
+	// 	ft_pwd(min);
+	// else if (ft_strcmp(min->comand, "echo") || ft_strcmp(min->comand, "ECHO"))
+	// 	ft_echo(min);
+	// else if (ft_strcmp(min->comand, "cd") || ft_strcmp(min->comand, "CD"))
+	// 	ft_cd(min);
+	// else if (ft_strcmp(min->comand, "export") || ft_strcmp(min->comand, "EXPORT"))
+	// 	ft_export(min);
+	// else if (ft_strcmp(min->comand, "unset") || ft_strcmp(min->comand, "UNSET"))
+	// 	ft_unset(min);
+	// else if (ft_strcmp(min->comand, "env") || ft_strcmp(min->comand, "ENV"))
+	// 	ft_env(min);
+	// else if (ft_strcmp(min->comand, "exit") || ft_strcmp(min->comand, "EXIT"))
+	// 	ft_exit(min);
+	return (i);
+}
+
+int	once_quote(char *line, int i, t_min *min)
+{
+	int j;
+
+	j = ++i;
+	while (line[i] != '\'')
+	{
+		min->argc[min->com_count] = (char *)realloc(min->argc[min->com_count], sizeof(char) * (i - j));
+		min->argc[min->com_count][i] = line[i];
+		printf("%c", min->argc[min->com_count][i]);
+		i++;
+	}
+	return (i);
+}
+
+int	two_quote(char *line, int i, t_min *min)
+{
+	int j;
+	int start_coint;
+
+	start_coint = ++i;
+	j = i;
+	while (line[i] != '\"')
+	{
+		if (line[i] == '$')
+			i = dollar_funk(line, i, min);
+		min->argc[min->com_count] = (char *)realloc(min->argc[min->com_count], sizeof(char) * (j - start_coint));
+		min->argc[min->com_count][j] = line[i];
+		printf("%c", min->argc[min->com_count][i]);
+		j++;
+		i++;
+	}
 	return (i);
 }
 
 void    ft_parser(t_min *min, char *line)
 {
 	int i;
+	int j;
 
+	j = 0;
 	i = 0;
-	min->argc = (char **)malloc(sizeof(char));
+	if (line[i])
+		min->argc = (char **)malloc(sizeof(char) * (++min->com_count));
 	while (line[i])
 	{
 		if (line[i] == '\'')
 			i = once_quote(line, i, min);
 		else if (line[i] == '\"')
-			two_quote(line, i);
+			i =two_quote(line, i, min);
 		else if (line[i] == '$')
 			i = dollar_funk(line, i, min);
 		else if (line[i] == ' ')
-			min->argc = (char **)realloc(min->argc, sizeof(char) * ++min->com_count);
+		{
+			min->argc = (char **)realloc(min->argc, sizeof(char) * (++min->com_count));
+			j = 0;
+		}
 		else
 		{
-			min->argc[min->com_count] = (char *)realloc(min->argc[min->com_count], sizeof(char) * i);
-			min->argc[min->com_count][i] = line[i];
-			printf("%c", min->argc[min->com_count][i]);
+			// if (!min->argc[min->com_count])
+			// 	min->argc[min->com_count] = (char *)malloc(sizeof(char *));
+			// else
+			min->argc[min->com_count] = (char *)realloc(min->argc[min->com_count], sizeof(char) * j);
+			min->argc[min->com_count][j] = line[i];
+			printf("%c", min->argc[min->com_count][j]);
 		}
 		i++;
+		j++;
+		// printf("count %d\n", min->com_count);
 	}
 	printf("\n");
 }
